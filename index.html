@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<script src="datos-productos.json"></script>
+    <!-- META TAGS PARA PWA -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="theme-color" content="#667eea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Buscador Biofitos">
+<meta name="description" content="Buscador de productos biofitos entre diferentes proveedores">
+<meta name="keywords" content="biofitos, productos, agricultura, proveedores">
+
+<!-- MANIFEST -->
+<link rel="manifest" href="manifest.json">
+
+<!-- ICONOS PARA DIFERENTES DISPOSITIVOS -->
+<link rel="icon" type="image/png" href="icons/icon-72x72.png" sizes="72x72">
+<link rel="icon" type="image/png" href="icons/icon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="icons/icon-128x128.png" sizes="128x128">
+<link rel="icon" type="image/png" href="icons/icon-144x144.png" sizes="144x144">
+<link rel="icon" type="image/png" href="icons/icon-152x152.png" sizes="152x152">
+<link rel="icon" type="image/png" href="icons/icon-192x192.png" sizes="192x192">
+<link rel="icon" type="image/png" href="icons/icon-384x384.png" sizes="384x384">
+<link rel="icon" type="image/png" href="icons/icon-512x512.png" sizes="512x512">
+<link rel="apple-touch-icon" href="icons/icon-152x152.png">
+
+<!-- SPLASH SCREEN PARA iOS -->
+<link rel="apple-touch-startup-image" href="splash/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos Biofitos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .filters {
+            background: #f8f9fa;
+            padding: 25px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        select, input {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-box {
+            grid-column: 1 / -1;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .results {
+            padding: 25px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .product-supplier {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .product-type {
+            background: #e9ecef;
+            color: #495057;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .product-composition {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .product-dosis {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .prices {
+            border-top: 1px solid #e9ecef;
+            padding-top: 15px;
+        }
+
+        .price-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+
+        .price-item {
+            text-align: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+
+        .price-format {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .price-value {
+            color: #28a745;
+            font-weight: 700;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Catálogo de Productos Biofitos</h1>
+            <div class="subtitle">Busca y compara productos entre diferentes proveedores</div>
+        </header>
+
+        <div class="filters">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="search">Buscar producto:</label>
+                    <input type="text" id="search" placeholder="Escribe el nombre del producto...">
+                </div>
+                <div class="filter-group">
+                    <label for="proveedor">Proveedor:</label>
+                    <select id="proveedor">
+                        <option value="">Todos los proveedores</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="tipo">Tipo de producto:</label>
+                    <select id="tipo">
+                        <option value="">Todos los tipos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="composicion">Composición:</label>
+                    <input type="text" id="composicion" placeholder="Elemento en composición...">
+                </div>
+            </div>
+            <div class="stats">
+                <span id="productCount">0 productos encontrados</span>
+                <span id="supplierCount">0 proveedores</span>
+            </div>
+        </div>
+
+        <div class="results">
+            <div class="product-grid" id="productGrid">
+                <div class="loading">Cargando productos...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+	let productos = [];
+
+// SOLUCIÓN SIMPLIFICADA - Elimina cargarDatos() compleja
+function cargarDatos() {
+    const loadingElement = document.getElementById('productGrid');
+    
+    // Mensaje inicial simple
+    loadingElement.innerHTML = `
+        <div class="no-results" style="text-align: center;">
+            <h3>🔄 Cargar Datos de Productos</h3>
+            <p>Selecciona el archivo <strong>"datos-productos.json"</strong> para comenzar</p>
+            <div style="margin: 20px 0;">
+                <input type="file" id="cargarArchivoManual" accept=".json" 
+                       style="padding: 12px; border: 2px dashed #007bff; border-radius: 8px; width: 80%; max-width: 300px;">
+            </div>
+            <button onclick="iniciarCargaManual()" 
+                    style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                📁 Cargar Archivo JSON
+            </button>
+            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left;">
+                <strong>💡 Instrucciones:</strong>
+                <ol>
+                    <li>Haz clic en el botón de arriba o selecciona el archivo directamente</li>
+                    <li>Busca el archivo <code>datos-productos.json</code></li>
+                    <li>Los datos se cargarán automáticamente</li>
+                </ol>
+            </div>
+        </div>
+    `;
+    
+    // Configurar el evento del input file
+    document.getElementById('cargarArchivoManual').addEventListener('change', function(e) {
+        manejarArchivoSeleccionado(e.target.files[0]);
+    });
+}
+
+// Función para el botón
+function iniciarCargaManual() {
+    document.getElementById('cargarArchivoManual').click();
+}
+
+// Función que procesa el archivo seleccionado
+function manejarArchivoSeleccionado(file) {
+    if (!file) return;
+    
+    const loadingElement = document.getElementById('productGrid');
+    loadingElement.innerHTML = '<div class="loading">Procesando archivo... ⚙️</div>';
+    
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        try {
+            // CORREGIR COMAS DECIMALES
+            const textoCorregido = e.target.result
+                .replace(/"kg_l":\s*(\d+),(\d+)/g, '"kg_l": $1.$2')
+                .replace(/"5kg_5l":\s*(\d+),(\d+)/g, '"5kg_5l": $1.$2')
+                .replace(/"10kg_l":\s*(\d+),(\d+)/g, '"10kg_l": $1.$2')
+                .replace(/"20l":\s*(\d+),(\d+)/g, '"20l": $1.$2')
+                .replace(/"220l":\s*(\d+),(\d+)/g, '"220l": $1.$2')
+                .replace(/"1000l":\s*(\d+),(\d+)/g, '"1000l": $1.$2')
+                .replace(/: (\d+),(\d+)([,\}])/g, ': $1.$2$3');
+            
+            const datos = JSON.parse(textoCorregido);
+            
+            if (!Array.isArray(datos)) {
+                throw new Error('El archivo no contiene un array válido');
+            }
+            
+            productos = datos;
+            datosCargados = true;
+            
+            console.log('✅ Archivo cargado correctamente:', productos.length, 'productos');
+            
+            // Inicializar la aplicación
+            initializeApp();
+            
+        } catch (error) {
+            console.error('❌ Error procesando archivo:', error);
+            loadingElement.innerHTML = `
+                <div class="no-results">
+                    <h3>❌ Error en el archivo</h3>
+                    <p><strong>Problema:</strong> ${error.message}</p>
+                    <p>Verifica que el archivo sea un JSON válido.</p>
+                    <button onclick="cargarDatos()" 
+                            style="margin-top: 15px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        🔄 Intentar con otro archivo
+                    </button>
+                </div>
+            `;
+        }
+    };
+    
+    reader.onerror = function() {
+        loadingElement.innerHTML = `
+            <div class="no-results">
+                <h3>❌ Error leyendo archivo</h3>
+                <p>No se pudo leer el archivo seleccionado.</p>
+                <button onclick="cargarDatos()" 
+                        style="margin-top: 15px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    🔄 Intentar de nuevo
+                </button>
+            </div>
+        `;
+    };
+    
+    reader.readAsText(file);
+}
+
+// FUNCIÓN PARA PROCESAR Y CORREGIR EL JSON
+function procesarJSON(texto) {
+    console.log('🔧 Procesando y corrigiendo JSON...');
+    
+    // CORRECCIÓN AUTOMÁTICA DE COMAS DECIMALES
+    const jsonCorregido = texto
+        .replace(/"kg_l":\s*(\d+),(\d+)/g, '"kg_l": $1.$2')
+        .replace(/"5kg_5l":\s*(\d+),(\d+)/g, '"5kg_5l": $1.$2')
+        .replace(/"10kg_l":\s*(\d+),(\d+)/g, '"10kg_l": $1.$2')
+        .replace(/"20l":\s*(\d+),(\d+)/g, '"20l": $1.$2')
+        .replace(/"220l":\s*(\d+),(\d+)/g, '"220l": $1.$2')
+        .replace(/"1000l":\s*(\d+),(\d+)/g, '"1000l": $1.$2')
+        .replace(/: (\d+),(\d+)([,\}])/g, ': $1.$2$3');
+    
+    const datos = JSON.parse(jsonCorregido);
+    
+    if (!Array.isArray(datos)) {
+        throw new Error('El JSON no contiene un array válido');
+    }
+    
+    return datos;
+}
+// Inicializar la aplicación
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Iniciando aplicación...');
+	cargarDatos();
+});
+		
+        function initializeApp() {
+            populateFilters();
+            displayProducts(productos);
+            setupEventListeners();
+        }
+
+        function populateFilters() {
+            const proveedores = [...new Set(productos.map(p => p.proveedor))].sort();
+            const tipos = [...new Set(productos.map(p => p.tipo))].sort();
+
+            const proveedorSelect = document.getElementById('proveedor');
+            const tipoSelect = document.getElementById('tipo');
+
+            proveedores.forEach(proveedor => {
+                const option = document.createElement('option');
+                option.value = proveedor;
+                option.textContent = proveedor;
+                proveedorSelect.appendChild(option);
+            });
+
+            tipos.forEach(tipo => {
+                const option = document.createElement('option');
+                option.value = tipo;
+                option.textContent = tipo;
+                tipoSelect.appendChild(option);
+            });
+        }
+
+        function setupEventListeners() {
+            document.getElementById('search').addEventListener('input', filterProducts);
+            document.getElementById('proveedor').addEventListener('change', filterProducts);
+            document.getElementById('tipo').addEventListener('change', filterProducts);
+            document.getElementById('composicion').addEventListener('input', filterProducts);
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const proveedor = document.getElementById('proveedor').value;
+            const tipo = document.getElementById('tipo').value;
+            const composicion = document.getElementById('composicion').value.toLowerCase();
+
+            const filtered = productos.filter(producto => {
+                const matchesSearch = producto.nombre.toLowerCase().includes(searchTerm);
+                const matchesProveedor = !proveedor || producto.proveedor === proveedor;
+                const matchesTipo = !tipo || producto.tipo === tipo;
+                const matchesComposicion = !composicion || 
+                    (producto.composicion && producto.composicion.toLowerCase().includes(composicion));
+
+                return matchesSearch && matchesProveedor && matchesTipo && matchesComposicion;
+            });
+
+            displayProducts(filtered);
+        }
+
+        function displayProducts(products) {
+            const productGrid = document.getElementById('productGrid');
+            const productCount = document.getElementById('productCount');
+            const supplierCount = document.getElementById('supplierCount');
+
+            productCount.textContent = `${products.length} productos encontrados`;
+            supplierCount.textContent = `${[...new Set(products.map(p => p.proveedor))].length} proveedores`;
+
+            if (products.length === 0) {
+                productGrid.innerHTML = '<div class="no-results">No se encontraron productos con los filtros seleccionados</div>';
+                return;
+            }
+
+            productGrid.innerHTML = products.map(producto => `
+                <div class="product-card">
+                    <div class="product-header">
+                        <div class="product-name">${producto.nombre}</div>
+                        <div class="product-supplier">${producto.proveedor}</div>
+                    </div>
+                    <div class="product-type">${producto.tipo}</div>
+                    
+                    ${producto.composicion ? `
+                        <div class="product-composition">${producto.composicion}</div>
+                    ` : ''}
+                    
+                    ${producto.dosis ? `
+                        <div class="product-dosis">
+                            <strong>Dosis:</strong> ${producto.dosis}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="prices">
+                        <div class="price-title">Precios por formato:</div>
+                        <div class="price-grid">
+                            ${Object.entries(producto.precios).map(([formato, precio]) => 
+                                precio !== null && precio !== undefined && precio !== '' ? `
+                                    <div class="price-item">
+                                        <div class="price-format">${formato}</div>
+                                        <div class="price-value">${typeof precio === 'number' ? precio.toFixed(2) + '€' : precio}</div>
+                                    </div>
+                                ` : ''
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+   
+	// ==================== 
+	// CÓDIGO PWA - INSTALACIÓN COMO APP
+	// ====================
+
+	// 1. REGISTRO DEL SERVICE WORKER (CACHE PARA OFFLINE)
+	if ('serviceWorker' in navigator) {
+		window.addEventListener('load', function() {
+			// Intenta registrar el service worker
+			navigator.serviceWorker.register('./sw.js')
+				.then(function(registration) {
+					console.log('✅ Service Worker registrado: ', registration.scope);
+				})
+				.catch(function(error) {
+					console.log('❌ Service Worker falló: ', error);
+					// Si falla, no pasa nada - la app sigue funcionando
+				});
+		});
+	}
+
+	// 2. DETECTAR CUÁNDO SE PUEDE INSTALAR LA APP
+	let deferredPrompt;
+	let installButton;
+
+	function crearBotonInstalacion() {
+		// Crear el botón de instalación
+		installButton = document.createElement('button');
+		installButton.innerHTML = '📱 Instalar App';
+		installButton.id = 'installButton';
+		installButton.style.cssText = `
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			padding: 12px 18px;
+			background: linear-gradient(135deg, #28a745, #20c997);
+			color: white;
+			border: none;
+			border-radius: 25px;
+			cursor: pointer;
+			z-index: 10000;
+			box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+			font-size: 14px;
+			font-weight: bold;
+			transition: all 0.3s ease;
+			display: none; /* Oculto inicialmente */
+		`;
+
+		// Efectos hover
+		installButton.onmouseover = function() {
+			this.style.transform = 'scale(1.05)';
+			this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+		};
+		
+		installButton.onmouseout = function() {
+			this.style.transform = 'scale(1)';
+			this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+		};
+
+		// Acción al hacer clic
+		installButton.onclick = async function() {
+			if (deferredPrompt) {
+				// Mostrar el prompt de instalación
+				deferredPrompt.prompt();
+				
+				// Esperar a que el usuario decida
+				const { outcome } = await deferredPrompt.userChoice;
+				
+				if (outcome === 'accepted') {
+					console.log('🎉 Usuario aceptó instalar la PWA');
+					mostrarNotificacion('¡App instalada! Busca el icono en tu pantalla de inicio 📱', 'success');
+					ocultarBotonInstalacion();
+				} else {
+					console.log('❌ Usuario rechazó la instalación');
+					mostrarNotificacion('Puedes instalar la app luego desde el menú ⋮', 'info');
+				}
+				
+				deferredPrompt = null;
+			}
+		};
+
+		document.body.appendChild(installButton);
+	}
+
+	function mostrarBotonInstalacion() {
+		if (installButton) {
+			installButton.style.display = 'block';
+			// Ocultar automáticamente después de 10 segundos
+			setTimeout(ocultarBotonInstalacion, 10000);
+		}
+	}
+
+	function ocultarBotonInstalacion() {
+		if (installButton) {
+			installButton.style.display = 'none';
+		}
+	}
+
+	// 3. DETECTAR CUÁNDO EL NAVEGADOR OFRECE INSTALACIÓN
+	window.addEventListener('beforeinstallprompt', (e) => {
+		console.log('🚀 beforeinstallprompt event fired');
+		
+		// Prevenir que el navegador muestre el prompt automático
+		e.preventDefault();
+		
+		// Guardar el evento para usarlo luego
+		deferredPrompt = e;
+		
+		// Crear y mostrar nuestro botón personalizado
+		if (!installButton) {
+			crearBotonInstalacion();
+		}
+		
+		// Mostrar notificación y botón
+		mostrarNotificacion('¡Puedes instalar esta app en tu dispositivo!', 'info');
+		mostrarBotonInstalacion();
+		
+		// También mostrar en consola para debug
+		console.log('📱 PWA lista para instalar. Usa nuestro botón o el menú del navegador.');
+	});
+
+	// 4. DETECTAR CUÁNDO LA APP SE INSTALA
+	window.addEventListener('appinstalled', () => {
+		console.log('🎉 PWA instalada satisfactoriamente');
+		deferredPrompt = null;
+		ocultarBotonInstalacion();
+		
+		// Opcional: enviar analytics o mostrar mensaje
+		mostrarNotificacion('¡App instalada correctamente! 🎉', 'success');
+	});
+
+	// 5. DETECTAR SI YA ESTÁ INSTALADA
+	window.addEventListener('load', () => {
+		if (window.matchMedia('(display-mode: standalone)').matches) {
+			console.log('📱 Ejecutándose como app instalada');
+			// Aquí puedes cambiar el comportamiento si está instalada
+		}
+	});
+
+	// 6. FUNCIÓN DE NOTIFICACIÓN (si no la tienes)
+	function mostrarNotificacion(mensaje, tipo = 'info') {
+		// Si ya tienes esta función, no hace falta
+		const colors = {
+			success: '#28a745',
+			error: '#dc3545', 
+			info: '#17a2b8',
+			warning: '#ffc107'
+		};
+		
+		const notificacion = document.createElement('div');
+		notificacion.textContent = mensaje;
+		notificacion.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			padding: 15px 20px;
+			background: ${colors[tipo] || colors.info};
+			color: white;
+			border-radius: 8px;
+			z-index: 10000;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			max-width: 300px;
+			word-wrap: break-word;
+		`;
+		
+		document.body.appendChild(notificacion);
+		
+		setTimeout(() => {
+			if (document.body.contains(notificacion)) {
+				document.body.removeChild(notificacion);
+			}
+		}, 4000);
+	}
+
+	console.log('🔧 Código PWA cargado - Listo para instalación');
+
+   </script>
+</body>
+</html>
