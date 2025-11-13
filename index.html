@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<script src="datos-productos.json"></script>
+<head>
+   
     <!-- META TAGS PARA PWA -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="theme-color" content="#667eea">
@@ -305,27 +306,57 @@
     <script>
 	let productos = [];
 
-// SOLUCIÓN SIMPLIFICADA - Elimina cargarDatos() compleja
-function cargarDatos() {
+async function cargarDatos() {
     const loadingElement = document.getElementById('productGrid');
     
-    // Mensaje inicial simple
+    // Primero intenta cargar automáticamente desde Netlify
+    try {
+        console.log('🔄 Intentando carga automática desde Netlify...');
+        loadingElement.innerHTML = '<div class="loading">Cargando productos desde el servidor... ⚙️</div>';
+        
+        const response = await fetch('./datos-productos.json');
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const text = await response.text();
+        console.log('📦 JSON recibido del servidor');
+        
+        // Procesar y corregir el JSON
+        productos = procesarJSON(text);
+        console.log(`✅ ${productos.length} productos cargados automáticamente`);
+        
+        // Inicializar la aplicación
+        initializeApp();
+        return;
+        
+    } catch (error) {
+        console.log('❌ Carga automática falló:', error.message);
+        // Si falla, mostrar opción de carga manual
+        mostrarOpcionCargaManual();
+    }
+}
+
+function mostrarOpcionCargaManual() {
+    const loadingElement = document.getElementById('productGrid');
+    
     loadingElement.innerHTML = `
         <div class="no-results" style="text-align: center;">
-            <h3>🔄 Cargar Datos de Productos</h3>
-            <p>Selecciona el archivo <strong>"datos-productos.json"</strong> para comenzar</p>
+            <h3>📁 Cargar Datos de Productos</h3>
+            <p>No se pudo cargar automáticamente. Selecciona el archivo <strong>"datos-productos.json"</strong></p>
             <div style="margin: 20px 0;">
                 <input type="file" id="cargarArchivoManual" accept=".json" 
                        style="padding: 12px; border: 2px dashed #007bff; border-radius: 8px; width: 80%; max-width: 300px;">
             </div>
             <button onclick="iniciarCargaManual()" 
                     style="padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
-                📁 Cargar Archivo JSON
+                📁 Seleccionar Archivo JSON
             </button>
             <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left;">
                 <strong>💡 Instrucciones:</strong>
                 <ol>
-                    <li>Haz clic en el botón de arriba o selecciona el archivo directamente</li>
+                    <li>Haz clic en el botón de arriba</li>
                     <li>Busca el archivo <code>datos-productos.json</code></li>
                     <li>Los datos se cargarán automáticamente</li>
                 </ol>
@@ -339,6 +370,7 @@ function cargarDatos() {
     });
 }
 
+// El resto de tus funciones (manejarArchivoSeleccionado, procesarJSON, etc.) se mantienen igual
 // Función para el botón
 function iniciarCargaManual() {
     document.getElementById('cargarArchivoManual').click();
