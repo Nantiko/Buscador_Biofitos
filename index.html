@@ -449,12 +449,12 @@ function procesarJSON(texto) {
     
     // CORRECCIÓN AUTOMÁTICA DE COMAS DECIMALES
     const jsonCorregido = texto
-        .replace(/"PRECIO KG\/L":\s*(\d+),(\d+)/g, '"PRECIO KG/L": $1.$2')
-        .replace(/"PRECIOS 5 KG\/5L":\s*(\d+),(\d+)/g, '"PRECIOS 5 KG/5L": $1.$2')
-        .replace(/"prec io 10 kg\/l":\s*(\d+),(\d+)/g, '"prec io 10 kg/l": $1.$2')
-        .replace(/"PRECIO 20-25 Kg\/L":\s*(\d+),(\d+)/g, '"PRECIO 20-25 Kg/L": $1.$2')
-        .replace(/"PRECIO 220 L":\s*(\d+),(\d+)/g, '"PRECIO 220 L": $1.$2')
-        .replace(/"PRECIO 1000 L":\s*(\d+),(\d+)/g, '"PRECIO 1000 L": $1.$2')
+        .replace(/"kg_l":\s*(\d+),(\d+)/g, '"kg_l": $1.$2')
+        .replace(/"5kg_5l":\s*(\d+),(\d+)/g, '"5kg_5l": $1.$2')
+        .replace(/"10kg_l":\s*(\d+),(\d+)/g, '"10kg_l": $1.$2')
+        .replace(/"20l":\s*(\d+),(\d+)/g, '"20l": $1.$2')
+        .replace(/"220l":\s*(\d+),(\d+)/g, '"220l": $1.$2')
+        .replace(/"1000l":\s*(\d+),(\d+)/g, '"1000l": $1.$2')
         .replace(/: (\d+),(\d+)([,\}])/g, ': $1.$2$3');
     
     const datos = JSON.parse(jsonCorregido);
@@ -462,48 +462,6 @@ function procesarJSON(texto) {
     if (!Array.isArray(datos)) {
         throw new Error('El JSON no contiene un array válido');
     }
-    
-    // TRANSFORMAR LA ESTRUCTURA DE DATOS
-    const productosTransformados = datos.map(producto => {
-        // Asignar un proveedor por defecto (puedes ajustar esto)
-        const proveedor = determinarProveedor(producto.NOMBRE);
-        
-        return {
-            proveedor: proveedor,
-            tipo: producto.TIPO || '',
-            nombre: producto.NOMBRE || '',
-            composicion: producto["COMPOSICIÓN"] || '',
-            dosis: producto.DOSIS || '',
-            precios: {
-                kg_l: producto["PRECIO KG/L"] || null,
-                "5kg_5l": producto["PRECIOS 5 KG/5L"] || null,
-                "10kg_l": producto["prec io 10 kg/l"] || null,
-                "20l": producto["PRECIO 20-25 Kg/L"] || null,
-                "220l": producto["PRECIO 220 L"] || null,
-                "1000l": producto["PRECIO 1000 L"] || null
-            }
-        };
-    });
-    
-    return productosTransformados;
-}
-
-// Función para determinar el proveedor basado en el nombre del producto
-function determinarProveedor(nombre) {
-    if (!nombre) return "Proveedor Desconocido";
-    
-    const nombreUpper = nombre.toUpperCase();
-    
-    if (nombreUpper.includes('BIORADIS')) return 'Bioradis';
-    if (nombreUpper.includes('NEOVIT')) return 'Neovit';
-    if (nombreUpper.includes('SAVIA')) return 'Savia';
-    if (nombreUpper.includes('NATUR')) return 'Naturcamp';
-    if (nombreUpper.includes('GLER')) return 'Gler';
-    if (nombreUpper.includes('HTpro')) return 'HTpro';
-    if (nombreUpper.includes('CYTO')) return 'Cytotek';
-    
-    return 'Otros Proveedores';
-}
     
     return datos;
 }
