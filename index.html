@@ -314,7 +314,7 @@ async function cargarDatos() {
         console.log('🔄 Intentando carga automática desde Netlify...');
         loadingElement.innerHTML = '<div class="loading">Cargando productos desde el servidor... ⚙️</div>';
         
-        const response = await fetch('./datos-productos.json');
+        const response = await fetch('./datos-productos-limpio.json');
         
         if (!response.ok) {
             throw new Error(`Error HTTP: ${response.status}`);
@@ -344,7 +344,7 @@ function mostrarOpcionCargaManual() {
     loadingElement.innerHTML = `
         <div class="no-results" style="text-align: center;">
             <h3>📁 Cargar Datos de Productos</h3>
-            <p>No se pudo cargar automáticamente. Selecciona el archivo <strong>"datos-productos.json"</strong></p>
+            <p>No se pudo cargar automáticamente. Selecciona el archivo <strong>"datos-productos-limpio.json"</strong></p>
             <div style="margin: 20px 0;">
                 <input type="file" id="cargarArchivoManual" accept=".json" 
                        style="padding: 12px; border: 2px dashed #007bff; border-radius: 8px; width: 80%; max-width: 300px;">
@@ -357,7 +357,7 @@ function mostrarOpcionCargaManual() {
                 <strong>💡 Instrucciones:</strong>
                 <ol>
                     <li>Haz clic en el botón de arriba</li>
-                    <li>Busca el archivo <code>datos-productos.json</code></li>
+                    <li>Busca el archivo <code>datos-productos-limpio.json</code></li>
                     <li>Los datos se cargarán automáticamente</li>
                 </ol>
             </div>
